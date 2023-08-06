@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@sjaakp/leaflet-search": "^1.0.1",
+    "leaflet-geosearch": "^3.8.0"
+  }
+}

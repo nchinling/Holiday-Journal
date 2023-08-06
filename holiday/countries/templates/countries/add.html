@@ -1,0 +1,194 @@
+{% extends "countries/layout.html" %}
+{% load static %}
+
+
+{% block body %}
+
+<style>
+   
+    #map {
+        height: 400px;
+        width: 600px;
+    }
+</style>
+
+    <h1 style="color: white;">Add Places Visited:</h1><br>
+    <div class="map-container">
+        <div id="map"></div>
+    </div><br>
+
+    <div class="form-container" style="color: white;">
+    <form action="{% url 'countries:add' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-field">
+            <label for="{{ form.country.id_for_label }}">Country:</label>
+            {{ form.country }}
+        </div>
+        <div class="form-field">
+            <label for="{{ form.city.id_for_label }}">City:</label>
+            {{ form.city }}
+        </div>
+    
+        <div class="form-field">
+            <label for="{{ form.entry.id_for_label }}">Entry:</label>
+            {{ form.entry }}
+        </div>
+    
+        <div class="form-field">
+            <label for="{{ form.fromDate.id_for_label }}">From:</label>
+            {{ form.fromDate }}
+        </div>
+    
+        <div class="form-field">
+            <label for="{{ form.toDate.id_for_label }}">To:</label>
+            {{ form.toDate }}
+        </div>
+        <!-- <input type="file" name="photo"> -->
+
+        <!-- <div class="form-field">
+            <label for="{{ form.photos.id_for_label }}">Photos:</label>
+            <input type="file" name="photos" id="{{ form.photos.id_for_label }}" multiple>
+        </div> -->
+
+        <div class="form-field">
+            <label for="{{ form.photos.id_for_label }}">Photos:</label>
+            <div id="photo-container">
+                <input type="file" name="photos" id="{{ form.photos.id_for_label }}" multiple>
+           
+            </div>
+            <button type="button" id="add-photo-btn" style="width:30px;" class="btn-info">+</button>
+        </div>
+
+        <input type="hidden" name="map_image" id="map_image_input">
+        
+        <input type="submit" value="Submit" class="btn-success">
+    </form>
+    </div>
+    <br>
+
+    <a href="{% url 'countries:index' %}">View Destinations Visited</a><br><br>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const photoContainer = document.getElementById('photo-container');
+            const addPhotoBtn = document.getElementById('add-photo-btn');
+    
+            addPhotoBtn.addEventListener('click', function () {
+                const newInput = document.createElement('input');
+                newInput.type = 'file';
+                newInput.name = 'photos';
+                newInput.multiple = true;
+                photoContainer.appendChild(newInput);
+            });
+        });
+    </script>
+
+
+<script>
+    var redIcon = L.icon({
+    iconUrl: '../../static/countries/images/leaf-red.png',
+    shadowUrl: '../../static/countries/images/leaf-shadow.png',
+
+    iconSize:     [38, 95], // size of the icon
+    shadowSize:   [50, 64], // size of the shadow
+    iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+    shadowAnchor: [4, 62],  // the same for the shadow
+    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+    });
+
+    var map = L.map('map').setView([42.3601, -71.0589], 5);
+    L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+    // L.Control.geocoder().addTo(map);
+    var marker = L.marker([42.3601, -71.0589], {icon: redIcon})
+                                .addTo(map)
+                                .bindPopup("Boston").openPopup();
+                                var geocoder = L.Control.geocoder({
+    defaultMarkGeocode: false // Prevents the default marker from being added for search results
+}).addTo(map);
+
+geocoder.on('markgeocode', function (e) {
+    var location = e.geocode.center;
+    var zoomLevel = 5; // Set the desired zoom level here
+
+    map.setView(location, zoomLevel);
+
+    // Remove any existing marker before adding the new one
+    if (marker) {
+        marker.removeFrom(map);
+    }
+
+    // Add a new marker with the custom icon and popup
+    marker = L.marker(location, { icon: redIcon }).addTo(map).bindPopup(e.geocode.name).openPopup();
+
+});
+    
+    const cityField = document.querySelector('#id_city');
+    cityField.addEventListener('change', function () {
+        const cityValue = cityField.value;
+
+        L.Control.Geocoder.nominatim().geocode(cityValue, function (results) {
+            if (results.length > 0) {
+                console.log('the results is' + results)
+                
+                const location = results[0].center;
+                console.log('the location is ' + location)
+                map.setView(location, 5);
+                const latitude = location.lat
+                const longitude = location.lng
+                console.log('the latitude is' + latitude)
+                console.log('the longitude is' + longitude)
+                var marker = L.marker([latitude, longitude], {icon: redIcon})
+                                .addTo(map)
+                                .bindPopup(cityValue).openPopup();
+        
+            }
+        }); 
+        
+    });
+
+    
+    document.querySelector('form').addEventListener('submit', function (event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    // Get the form element
+    const form = event.target;
+
+    // Disable the submit button to prevent multiple submissions
+    const submitBtn = form.querySelector('input[type="submit"]');
+    submitBtn.disabled = true;
+
+    console.log('Submitting form...');
+
+        // Capture the map image using leaflet-image
+        leafletImage(map, function (err, canvas) {
+        if (err) {
+            console.error('Error capturing map image:', err);
+            // Handle the error if necessary
+            return;
+        }
+
+        console.log('I am inside leafletImage...');
+
+
+        // Get the data URL of the captured map image
+        const dataURL = canvas.toDataURL();
+
+        // Set the map image data URL to the hidden input field in the form
+        const mapImageInput = document.getElementById('map_image_input');
+        mapImageInput.value = dataURL;
+
+        console.log('I have given dataURL to mapImageInput');
+
+        // Now, you can submit the form
+        form.submit();
+    });
+
+});
+
+</script>
+
+
+<!-- <script src="{% static 'countries/searchmap.js' %}" defer></script> -->
+{% endblock %}

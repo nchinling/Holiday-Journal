@@ -1,0 +1,69 @@
+.form-container {
+    max-width: 500px; 
+    margin: 0 auto; 
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.form-field label {
+    font-weight: bold;
+}
+
+.form-field input,
+.form-field textarea {
+    padding: 5px;
+}
+
+body {
+    background-color: #0079FF !important;
+}
+
+.navbar{
+    background-color:#00DFA2
+}
+
+.brand-holiday {
+    color: #FF0060;
+}
+
+/* Define the styles for the journal part of the brand */
+.brand-journal {
+    color: #0079FF; 
+}
+
+.thumbnail {
+    width: 150px; 
+    /* height: 150px;  */
+    object-fit: cover; 
+    margin: 5px; 
+}
+
+
+.destination-entry-container {
+    background-color: #FF0060;
+    color: white;
+    border: 2px solid #ccc;
+    padding: 10px;
+    border-radius: 12px;
+    width: 100%;
+}
+
+@media (min-width: 769px) {
+    .destination-entry-container {
+        width: 50%; /* Set the width to 50% for larger screens */
+    }
+}
+
+#map { height: 250px; }
+
+
+.map-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+     
+}

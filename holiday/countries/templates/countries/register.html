@@ -1,0 +1,37 @@
+{% extends "countries/layout.html" %}
+
+{% block body %} 
+
+    
+<!--Register--> 
+<div class="form-container" style="color: white;">
+	<h1>Register</h1>
+	<form method="POST">
+		{% csrf_token %}
+		
+        <div class="form-field">
+            <label for="{{ register_form.username.id_for_label }}">Username:</label>
+            {{ register_form.username }}
+          
+        </div>
+        <div class="form-field">
+            <label for="{{ register_form.email.id_for_label }}">Email:</label>
+            {{ register_form.email }}
+     
+        </div>      
+        <div class="form-field">
+            <label for="{{ register_form.password1.id_for_label }}">Password:</label>
+            {{ register_form.password1 }}
+           
+        </div> 
+        <div class="form-field">
+            <label for="{{ register_form.password2.id_for_label }}">Password Confirmation:</label>
+            {{ register_form.password2 }}
+       
+        </div>                          
+		<button class="btn btn-secondary" type="submit">Register</button>
+	</form><br>
+	<p class="text-center" style="color: white;">If you already have an account, <a href="{% url 'countries:add' %}" style="color: #FF0060;">login</a> instead.</p>
+</div>
+
+{% endblock %}

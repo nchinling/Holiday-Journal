@@ -1,0 +1,82 @@
+{% extends "countries/layout.html" %}
+{% load static %}
+
+<!--{% block head %}
+<link href="{% static 'countries/lightbox.css' %}" rel="stylesheet">
+{% endblock %} -->
+
+{% block body %}
+{% if user.is_authenticated %}
+<h1 style="color: white;">Welcome, {{ request.user.username }}</h1>
+{% endif %}
+<br>
+
+<!-- for map -->
+<div id="map"></div>
+
+<form class="form-inline my-2 my-lg-0" action="{% url 'countries:search' %}" method="GET">
+    <input class="form-control mr-sm-2" type="text" name="query" placeholder="Search by city or country" aria-label="Search">
+    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+</form>
+
+    <h1 style="color: white;">Destinations</h1>
+   
+        
+        {% for destination in destinations  %}
+        <div class="destination-entry-container">
+            <li><a href="{% url 'countries:destination' destination.id %}">
+            <!-- <span style="color: black;">Visited {{destination.city.all.first}}, {{destination.country}} from ({{ destination.fromDate }} to {{ destination.toDate }}) by</span> -->
+            <span style="color: #00DFA2; font-family: Times New Roman, Times, serif; font-weight: bold;">{{ destination.username }}</span>
+            <span style="color: white;">visited {{destination.city.all.first}}, {{destination.country}} ({{ destination.fromDate }} to {{ destination.toDate }})</span>
+            </a>
+            <p>Posted on: {{ destination.date_posted }}</p>
+            </li>
+        
+        {% if destination.map_image.all %}
+        <div>
+            {% for map_image in destination.map_image.all %}
+                <a href="{{ map_image.image_data|safe }}" data-lightbox="destination-{{ destination.id }}">
+                    <img src="{{ map_image.image_data|safe }}" alt="Destination Map" style="width:300px;">
+                </a>
+            {% endfor %}
+        </div>
+
+        {% else %}
+            <p>No map available for this destination.</p>
+        {% endif %}
+        <br>
+        
+        <!-- display photos -->
+        {% if destination.photos.all %}
+        <div>
+            {% for photo in destination.photos.all %}
+                <a href="{{ photo.image.url }}" data-lightbox="destination-{{ destination.id }}">
+                    <img src="{{ photo.image.url }}" alt="Destination Photo" style="width:200px;">
+                </a>
+            {% endfor %}
+        </div>
+
+        {% else %}
+            <p>No photos available for this destination.</p>
+        {% endif %}
+        <br>
+
+
+        </div><br>
+
+        {% endfor %}
+        
+ 
+    {% if user.is_authenticated %}
+    <a href="{% url 'countries:add' %}" class="btn btn-primary">Add Destination</a>&nbsp;&nbsp;
+   
+    <a href="{% url 'countries:logout' %}" class="btn btn-primary">Log Out</a><br><br>
+    {% endif %}
+
+
+<script src="{% static 'countries/map.js' %}"></script>
+{% endblock %}
+
+
+
+

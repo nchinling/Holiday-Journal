@@ -1,0 +1,111 @@
+{% extends "countries/layout.html" %}
+
+{% block body %}
+    <h1 style="color: white;">Edit Destination</h1>
+    <div class="form-container">
+    <form method="post" enctype="multipart/form-data" style="color: white;">
+        {% csrf_token %}
+        <!-- {{ form.as_p }} -->
+        <div class="form-field">
+            <label for="{{ form.country.id_for_label }}">Country:</label>
+            {{ form.country }}
+        </div>
+        <div class="form-field">
+            <label for="{{ form.city.id_for_label }}">City:</label>
+            {{ form.city }}
+        </div>
+    
+        <div class="form-field">
+            <label for="{{ form.entry.id_for_label }}">Entry:</label>
+            {{ form.entry }}
+        </div>
+    
+        <div class="form-field">
+            <label for="{{ form.fromDate.id_for_label }}">From:</label>
+            {{ form.fromDate }}
+        </div>
+    
+        <div class="form-field">
+            <label for="{{ form.toDate.id_for_label }}">To:</label>
+            {{ form.toDate }}
+        </div>
+
+        {% if destination.photos.all %}
+        <div>
+            {% for photo in destination.photos.all %}
+                <a href="{{ photo.image.url }}" data-lightbox="destination-{{ destination.id }}">
+                    <img src="{{ photo.image.url }}" alt="Destination Photo" style="width:200px;">
+                    <button type="button" class="btn btn-danger" onclick="deletePhoto({{ photo.id }})">Remove</button>
+                </a><br>
+            {% endfor %}
+        </div>
+    
+        {% else %}
+            <p>No photos available for this destination.</p>
+        {% endif %}
+
+
+        <div class="form-field">
+            <label for="{{ form.photos.id_for_label }}"></label>
+            <div id="photo-container">
+                <input type="file" name="photos" id="{{ form.photos.id_for_label }}" multiple>
+                <button type="button" id="add-photo-btn" style="width:30px;" class="btn-secondary">+</button>
+            </div>
+            <!-- <button type="button" id="add-photo-btn" style="width:30px;" class="btn-success">+</button> -->
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <!-- <button type="submit" formaction="{% url 'countries:delete_journal' destination.id %}" class="btn btn-danger">Delete Journal</button> -->
+       
+        <a href="{% url 'countries:index' %}" class="btn btn-primary">Cancel</a>
+        <button type="submit" formaction="{% url 'countries:delete_journal' destination.id %}" class="btn btn-danger">Delete Journal</button>
+    </form>
+    <!-- <form method="post" action="{% url 'countries:delete_journal' destination.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete Journal</button>
+    </form> -->
+    
+    </div>
+
+    <script>
+        function deletePhoto(photoId) {
+            // Send an AJAX request to delete the photo
+            const url = "{% url 'countries:delete_photo' %}";
+            const formData = new FormData();
+            formData.append("photo_id", photoId);
+    
+            fetch(url, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Reload the page to see the updated photos after deletion
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error("Error deleting photo:", error);
+            });
+        }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const photoContainer = document.getElementById('photo-container');
+            const addPhotoBtn = document.getElementById('add-photo-btn');
+
+            addPhotoBtn.addEventListener('click', function () {
+                const newInput = document.createElement('input');
+                newInput.type = 'file';
+                newInput.name = 'photos';
+                newInput.multiple = true;
+                photoContainer.appendChild(newInput);
+            });
+        });
+    </script>
+
+{% endblock %}

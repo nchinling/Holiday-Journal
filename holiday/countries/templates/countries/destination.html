@@ -1,0 +1,53 @@
+{% extends "countries/layout.html" %}
+
+
+{% block body %}
+
+
+    
+    <ul style="color: white;">
+        <h1>Country: {{ destination.country }}</h1>
+        Date: {{ destination.fromDate }} to  {{destination.toDate}}
+        {% for city in destination.city.all %}
+            <p>City: {{ city.name }}</p>
+            <div class="destination-entry-container">
+                <p>{{ destination.entry }}</p>
+            </div>
+            <p>By <span style="color: #00DFA2; font-family: Times New Roman, Times, serif; font-weight: bold;">{{ destination.username }}</span></p>
+            <p>Posted on: {{ destination.date_posted }}</p>
+        {% endfor %}
+        
+        {% if destination.map_image.all %}
+        <div>
+            {% for map_image in destination.map_image.all %}
+                <a href="{{ map_image.image_data|safe }}" data-lightbox="destination-{{ destination.id }}">
+                    <img src="{{ map_image.image_data|safe }}" alt="Destination Map" style="width:350px;">
+                </a>
+            {% endfor %}
+        </div>
+
+        {% else %}
+            <p>No map available for this destination.</p>
+        {% endif %}
+        <br>
+        
+        {% if destination.photos.all %}
+        <div>
+            {% for photo in destination.photos.all %}
+                <a href="{{ photo.image.url }}" data-lightbox="destination-{{ destination.id }}">
+                    <img src="{{ photo.image.url }}" alt="Destination Photo" style="width:300px;">
+                </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>No photos available for this destination.</p>
+        {% endif %}<br>
+
+        {% if user.username  == destination.username %}
+        <a href="{% url 'countries:edit' destination.id %}" class="btn btn-primary">Edit</a>
+        {% endif %}
+        <a href="{% url 'countries:index' %}" class="btn btn-primary">All Destinations</a>
+       <br><br>
+    </ul>
+    
+{% endblock %}
